@@ -1,23 +1,33 @@
 package io.github.blaney83.todo;
 import io.github.blaney83.todo.datamodel.TDData;
 import io.github.blaney83.todo.datamodel.TDItem;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class Controller {
     private List<TDItem> todoItems;
+    private FilteredList<TDItem> filteredList;
+    private Predicate<TDItem> showAll;
+    private Predicate<TDItem> showToday;
     @FXML
     private ListView<TDItem> tdListView;
     @FXML
@@ -28,7 +38,8 @@ public class Controller {
     private BorderPane mainBorderPane;
     @FXML
     private ContextMenu listContextMenu;
-
+    @FXML
+    private ToggleButton filterToggleButton;
 
 
     public void initialize(){
@@ -42,6 +53,30 @@ public class Controller {
                 deleteItem(item);
             }
         });
+        showAll = new Predicate<TDItem>() {
+            @Override
+            public boolean test(TDItem tdItem) {
+                return true;
+            }
+        };
+        showToday = new Predicate<TDItem>() {
+            @Override
+            public boolean test(TDItem tdItem) {
+                return tdItem.getDeadline().equals(LocalDate.now());
+            }
+        };
+        filteredList = new FilteredList<TDItem>(TDData.getInstance().getTdItems(), showAll);
+
+        SortedList<TDItem> sortedList = new SortedList<TDItem>(filteredList, new Comparator<TDItem>() {
+            @Override
+            public int compare(TDItem o1, TDItem o2) {
+                if(o1 != null && o2 != null) {
+                    return o1.getDeadline().compareTo(o2.getDeadline());
+                }
+                return -1;
+            }
+        });
+
         listContextMenu.getItems().addAll(deleteMenuItem);
         tdListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TDItem>() {
             @Override
@@ -54,7 +89,7 @@ public class Controller {
                 }
             }
         });
-        tdListView.setItems(TDData.getInstance().getTdItems());
+        tdListView.setItems(sortedList);
         tdListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tdListView.getSelectionModel().selectFirst();
 
@@ -99,8 +134,18 @@ public class Controller {
                 return cell;
             }
         });
-    }
 
+    }
+    @FXML
+    public void handleKeyDown(KeyEvent keyEvent){
+        TDItem item = tdListView.getSelectionModel().getSelectedItem();
+        if(item != null){
+            if(keyEvent.getCode().equals(KeyCode.DELETE)){
+                deleteItem(item);
+            }
+        }
+    }
+    @FXML
     public void deleteItem(TDItem item){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete To-Do Item");
@@ -135,6 +180,30 @@ public class Controller {
             TDItem newItem = dialogController.handleNewItem();
             tdListView.getSelectionModel().select(newItem);
         }
+    }
+
+    @FXML
+    public void filterList(){
+        TDItem selectedItem = tdListView.getSelectionModel().getSelectedItem();
+        if(filterToggleButton.isSelected()){
+            filteredList.setPredicate(showToday);
+            if(filteredList.isEmpty()){
+                centerTextArea.clear();
+                dateLabel.setText("");
+            }else if(filteredList.contains(selectedItem)){
+                tdListView.getSelectionModel().select(selectedItem);
+            }else{
+                tdListView.getSelectionModel().selectFirst();
+            }
+        }else{
+            filteredList.setPredicate(showAll);
+            tdListView.getSelectionModel().select(selectedItem);
+        }
+    }
+
+    @FXML
+    public void exitProgram(){
+        Platform.exit();
     }
 }
 
