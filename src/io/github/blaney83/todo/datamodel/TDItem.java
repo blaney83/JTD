@@ -37,8 +37,4 @@ public class TDItem {
         this.deadline = deadline;
     }
 
-    @Override
-    public String toString() {
-        return shortDescription;
-    }
 }

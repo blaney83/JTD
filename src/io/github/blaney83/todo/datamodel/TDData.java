@@ -1,6 +1,7 @@
 package io.github.blaney83.todo.datamodel;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -11,13 +12,12 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
-import java.util.List;
 
 public class TDData {
     private static TDData instance = new TDData();
     private static String filename = "TDListItems.txt";
 
-    private List<TDItem> tdItems;
+    private ObservableList<TDItem> tdItems;
     private DateTimeFormatter formatter;
 
     public static TDData getInstance() {
@@ -28,7 +28,7 @@ public class TDData {
         formatter = DateTimeFormatter.ofPattern("E, MMM dd, yyyy");
     }
 
-    public List<TDItem> getTdItems() {
+    public ObservableList<TDItem> getTdItems() {
         return tdItems;
     }
 
@@ -82,5 +82,9 @@ public class TDData {
                 bw.close();
             }
         }
+    }
+
+    public void deleteItem(TDItem item){
+        tdItems.remove(item);
     }
 }
