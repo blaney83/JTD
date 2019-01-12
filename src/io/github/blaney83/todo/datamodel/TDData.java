@@ -32,8 +32,9 @@ public class TDData {
         return tdItems;
     }
 
-    public void setTdItems(List<TDItem> tdItems) {
-        this.tdItems = tdItems;
+    public void addTDItem(TDItem item){
+        tdItems.add(item);
+
     }
 
     public void loadTDItems() throws IOException {
