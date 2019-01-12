@@ -2,15 +2,38 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
 <BorderPane fx:controller="io.github.blaney83.todo.Controller"
             xmlns:fx="http://javafx.com/fxml">
     <top></top>
     <left>
-        <ListView fx:id="tdListView" onMouseClicked="#handleClickTDItem">
+        <ListView fx:id="tdListView">
         </ListView>
     </left>
     <center>
-        <TextArea fx:id="centerTextArea"/>
+        <VBox style="-fx-background-color: white">
+            <TextArea fx:id="centerTextArea" VBox.vgrow="ALWAYS"/>
+            <HBox >
+                <padding>
+                    <Insets top="4" bottom="4" left="4"/>
+                </padding>
+                <Label text="Due:    " style="-fx-background-color: white">
+                    <font>
+                        <Font name="Arial" size="16" />
+                    </font>
+                </Label>
+                <Label fx:id="dateLabel" style="-fx-background-color: white">
+
+                    <font>
+                        <Font name="Arial" size="16"/>
+                    </font>
+                </Label>
+            </HBox>
+        </VBox>
     </center>
     <right></right>
     <bottom></bottom>
