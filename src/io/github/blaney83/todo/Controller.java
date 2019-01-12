@@ -4,15 +4,20 @@ import io.github.blaney83.todo.datamodel.TDItem;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextArea;
+import javafx.scene.text.Text;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Controller {
     private List<TDItem> todoItems;
     @FXML
-    private ListView tdListView;
+    private ListView<TDItem> tdListView;
+    @FXML
+    private TextArea centerTextArea;
 
 
     public void initialize(){
@@ -26,7 +31,15 @@ public class Controller {
 
         tdListView.getItems().setAll(todoItems);
         tdListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+    }
 
+    @FXML
+    public void handleClickTDItem(){
+        DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("E, MMM dd yyyy");
+        TDItem item = tdListView.getSelectionModel().getSelectedItem();
+        StringBuilder sb = new StringBuilder(item.getDetails());
+        sb.append("\n\n\n\nDue: " + item.getDeadline().format(FORMATTER));
+        centerTextArea.setText(sb.toString());
     }
 }
 
